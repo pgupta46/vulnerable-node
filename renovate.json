@@ -1,5 +1,26 @@
 {
-  "extends": [
-    "group:nodeJs"
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:base"],
+  "automerge": true, // this tells renovate to merge passing PRs without reviews for non-major deps prs
+  "prConcurrentLimit": 20,  // let this be either equal to # of deps or >=20
+  "prCreation": "not-pending",
+  "semanticCommits": "enabled",  // use semantic versioning commits
+  "major": { // all major deps prs will share these settings
+    "automerge": false //never automerge major prs, wait for a review
+  },
+  "postUpdateOptions": ["npmDedupe"], //golang specific option to tidy up the go.mo/sum files
+  "schedule": ["before 12pm on Monday"], // schedule when you want renovate to file prs for this project
+  "timezone": "America/New_York", // by default renovate will be on GMT/UTC
+  "packageRules": [  //packageRules allows you to dictate to renovate how certain deps will be updated or whether their versions are going to be pinned, etc.
+    {
+      "matchDepTypes": ["devDependencies"], // this rule combines all non-major dep updates into single PR
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "Non-Major Dependencies"
+    },
+    {
+      "matchPackagePatterns": ["angular"],// group similar packages together to reduce # of PRs
+      "matchPaths": ["package.json"],
+      "matchUpdateTypes": ["major"]
+    }
   ]
 }
